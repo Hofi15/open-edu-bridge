@@ -1,6 +1,6 @@
 # 🎓 OpenEduBridge
 
-> **Das datenschutzkonforme Framework für flexibles Lernen, Wochenplanung und intelligente Lernprozess-Diagnostik.**
+> **Das datenschutzkonforme Framework für flexibles Lernen, Wochenplanung und intelligente Lernprozess-Diagnostik. Die Brücke zwischen Schule und einem flexiblen Leben**
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
