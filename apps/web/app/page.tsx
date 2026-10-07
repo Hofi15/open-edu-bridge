@@ -1,92 +1,201 @@
-import React from 'react';
+'use client';
 
-export default function Home() {
+import React, { useState } from 'react';
+
+type Day = 'Montag' | 'Dienstag' | 'Mittwoch' | 'Donnerstag' | 'Freitag';
+
+interface Task {
+  id: string;
+  subject: string;
+  title: string;
+  description: string;
+  day: Day;
+  status: 'GRUEN' | 'GELB' | 'ROT';
+}
+
+const DAYS: Day[] = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'];
+
+export default function PlannerPage() {
+  const [tasks, setTasks] = useState<Task[]>([
+    {
+      id: '1',
+      subject: 'Mathematik',
+      title: 'Bruchrechnung S. 42 Nr. 1-4',
+      description: 'Aufgaben im Heft bearbeiten und Ergebnisse kontrollieren.',
+      day: 'Montag',
+      status: 'GRUEN',
+    },
+    {
+      id: '2',
+      subject: 'Deutsch',
+      title: 'Leseabschnitt Kapitel 3',
+      description: 'Stichpunkte zur Hauptfigur im Lesetagebuch notieren.',
+      day: 'Dienstag',
+      status: 'GELB',
+    },
+  ]);
+
+  const [selectedDay, setSelectedDay] = useState<Day>('Montag');
+  const [subject, setSubject] = useState('');
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+
+  const handleAddTask = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title || !subject) return;
+
+    const newTask: Task = {
+      id: Date.now().toString(),
+      subject,
+      title,
+      description,
+      day: selectedDay,
+      status: 'GRUEN',
+    };
+
+    setTasks([...tasks, newTask]);
+    setTitle('');
+    setDescription('');
+  };
+
+  const getStatusBadge = (status: Task['status']) => {
+    switch (status) {
+      case 'GRUEN':
+        return <span className="bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded-full font-medium">🟢 Im Zeitplan</span>;
+      case 'GELB':
+        return <span className="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded-full font-medium">🟡 Frage / Hilfe</span>;
+      case 'ROT':
+        return <span className="bg-rose-100 text-rose-800 text-xs px-2 py-1 rounded-full font-medium">🔴 Rückstand</span>;
+    }
+  };
+
   return (
-    <main className="min-h-screen bg-slate-50 p-8 text-slate-800">
+    <main className="min-h-screen bg-slate-50 p-6 md:p-10 text-slate-800">
       {/* Header */}
-      <header className="max-w-5xl mx-auto flex justify-between items-center pb-8 border-b border-slate-200">
-        <div className="flex items-center gap-3">
-          <span className="text-4xl">🎓</span>
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900">OpenEduBridge</h1>
-            <p className="text-xs text-slate-500">Datenschutzkonforme Lernplattform</p>
-          </div>
+      <header className="max-w-6xl mx-auto flex justify-between items-center pb-6 border-b border-slate-200 mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+            <span>📅</span> Wochenplan-Hub (Lehrkräfte)
+          </h1>
+          <p className="text-xs text-slate-500">OpenEduBridge – Digitale Lernbegleitung</p>
         </div>
-        <span className="bg-emerald-100 text-emerald-800 text-xs font-semibold px-3 py-1 rounded-full">
-          AGPL v3.0 Open Source
-        </span>
+        <a href="/" className="text-sm text-blue-600 hover:underline">
+          ← Startseite
+        </a>
       </header>
 
-      {/* Intro / Vision */}
-      <section className="max-w-5xl mx-auto my-12 text-center">
-        <h2 className="text-4xl font-extrabold text-slate-900 mb-4">
-          Vom Anwesenheitsnachweis zum <span className="text-blue-600">Lernfortschritt</span>
-        </h2>
-        <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-8">
-          Verbindet Präsenzunterricht und flexibles Lernen im Home-Office. Datenschutzkonform, verlässlich und ohne Stigmatisierung.
-        </p>
-      </section>
+      <div className="max-w-6xl mx-auto grid lg:grid-cols-3 gap-8">
+        {/* Formular: Neue Aufgabe anlegen */}
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 h-fit">
+          <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+            <span>➕</span> Neue Aufgabe erstellen
+          </h2>
+          <form onSubmit={handleAddTask} className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1">Wochentag</label>
+              <select
+                value={selectedDay}
+                onChange={(e) => setSelectedDay(e.target.value as Day)}
+                className="w-full p-2.5 border border-slate-300 rounded-lg text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                {DAYS.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-      {/* Rollenauswahl / Quick Access */}
-      <section className="max-w-5xl mx-auto grid md:grid-cols-3 gap-6 mb-16">
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition">
-          <div className="text-3xl mb-3">👩‍🏫</div>
-          <h3 className="text-xl font-bold mb-2 text-slate-900">Lehrkräfte</h3>
-          <p className="text-sm text-slate-600 mb-4">
-            Wochenpläne erstellen, Aufgaben vorausplanen und Hilferufe der Klasse im Blick behalten.
-          </p>
-          <button className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg text-sm transition">
-            Wochenplan-Hub öffnen
-          </button>
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1">Fach</label>
+              <input
+                type="text"
+                placeholder="z.B. Mathematik, Deutsch..."
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                className="w-full p-2.5 border border-slate-300 rounded-lg text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1">Titel der Aufgabe</label>
+              <input
+                type="text"
+                placeholder="Kurze Beschreibung"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full p-2.5 border border-slate-300 rounded-lg text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1">Details / Hinweise</label>
+              <textarea
+                rows={3}
+                placeholder="Zusätzliche Erklärungen..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full p-2.5 border border-slate-300 rounded-lg text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg text-sm transition shadow-sm"
+            >
+              Aufgabe zum Wochenplan hinzufügen
+            </button>
+          </form>
         </div>
 
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition">
-          <div className="text-3xl mb-3">🎒</div>
-          <h3 className="text-xl font-bold mb-2 text-slate-900">Schüler:innen</h3>
-          <p className="text-sm text-slate-600 mb-4">
-            Aufgaben abarbeiten, Lernfortschritt sehen und diskret Hilfe per Smart-Ampel anfordern.
-          </p>
-          <button className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg text-sm transition">
-            Meine Aufgaben
-          </button>
-        </div>
-
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-md transition">
-          <div className="text-3xl mb-3">🏡</div>
-          <h3 className="text-xl font-bold mb-2 text-slate-900">Eltern</h3>
-          <p className="text-sm text-slate-600 mb-4">
-            Transparenter Einblick in den Lernfortschritt der eigenen Kinder bei Krankheit oder Abwesenheit.
-          </p>
-          <button className="w-full py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium rounded-lg text-sm transition">
-            Übersicht ansehen
-          </button>
-        </div>
-      </section>
-
-      {/* Smart Ampelsystem Preview */}
-      <section className="max-w-5xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
-        <h3 className="text-2xl font-bold mb-4 text-slate-900 text-center">🚦 Smart-Ampelsystem & Hilferuf</h3>
-        <p className="text-slate-600 text-center mb-6 max-w-xl mx-auto text-sm">
-          Schüler signalisieren ihren Status ohne Stigmatisierung – nur für die Lehrkraft und Eltern sichtbar.
-        </p>
-        <div className="grid md:grid-cols-3 gap-4 text-center">
-          <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200">
-            <span className="text-2xl">🟢</span>
-            <h4 className="font-bold text-emerald-900 mt-2">Grün</h4>
-            <p className="text-xs text-emerald-700 mt-1">Im Zeitplan, Thema verstanden</p>
+        {/* Wochenübersicht (Spalten oder Tageskarten) */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-bold text-slate-900">Wochenübersicht</h2>
+            <span className="text-xs bg-blue-100 text-blue-800 font-semibold px-3 py-1 rounded-full">
+              {tasks.length} Aufgaben insgesamt
+            </span>
           </div>
-          <div className="p-4 rounded-xl bg-amber-50 border border-amber-200">
-            <span className="text-2xl">🟡</span>
-            <h4 className="font-bold text-amber-900 mt-2">Gelb (Hilferuf)</h4>
-            <p className="text-xs text-amber-700 mt-1">Hilfe benötigt / Thema unklar</p>
-          </div>
-          <div className="p-4 rounded-xl bg-rose-50 border border-rose-200">
-            <span className="text-2xl">🔴</span>
-            <h4 className="font-bold text-rose-900 mt-2">Rot</h4>
-            <p className="text-xs text-rose-700 mt-1">Kritischer Rückstand</p>
+
+          <div className="space-y-4">
+            {DAYS.map((day) => {
+              const dayTasks = tasks.filter((t) => t.day === day);
+              return (
+                <div key={day} className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                  <div className="flex justify-between items-center mb-3">
+                    <h3 className="font-bold text-slate-900 text-md">{day}</h3>
+                    <span className="text-xs text-slate-400 font-medium">{dayTasks.length} Aufgabe(n)</span>
+                  </div>
+
+                  {dayTasks.length === 0 ? (
+                    <p className="text-xs text-slate-400 italic">Keine Aufgaben für {day} eingetragen.</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {dayTasks.map((task) => (
+                        <div
+                          key={task.id}
+                          className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex justify-between items-start"
+                        >
+                          <div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-xs font-bold bg-slate-200 text-slate-700 px-2 py-0.5 rounded">
+                                {task.subject}
+                              </span>
+                              <h4 className="font-bold text-sm text-slate-800">{task.title}</h4>
+                            </div>
+                            <p className="text-xs text-slate-600">{task.description}</p>
+                          </div>
+                          <div className="ml-4">{getStatusBadge(task.status)}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
-      </section>
+      </div>
     </main>
   );
 }
